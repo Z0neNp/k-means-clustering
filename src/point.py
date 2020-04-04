@@ -121,5 +121,4 @@ if __name__ == '__main__':
 			self.assertLess(Point(4, 3), Point(-4, -4))
 			self.assertLess(Point(4, 3), Point(-5, -3))
 
-
-unittest.main()
+	unittest.main()
