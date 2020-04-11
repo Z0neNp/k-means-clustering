@@ -8,15 +8,9 @@ class QuickSortParallelWorker(threading.Thread):
 		threading.Thread.__init__(self)
 		try:
 			self.thread_id = thread_id
-		except RuntimeError as err:
-			err_msg = "Failed to initialize QuickSortParallelWorker object with the thread_id."
-			err_msg += f" Reason:\n\t{str(err)}"
-			raise RuntimeError(err_msg)
-		try:
 			self.qs = QuickSort(elements)
 		except RuntimeError as err:
-			err_msg = "Failed to initialize QuickSortParallelWorker object with the elements."
-			err_msg += f" Reason: \n\t{str(err)}"
+			err_msg = f"Failed to initialize QuickSortParallelWorker object. Reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
 		self._error = None
 
@@ -44,14 +38,14 @@ class QuickSortParallelWorker(threading.Thread):
 		if type(quick_sort) is QuickSort:
 			self._qs = quick_sort
 		else:
-			raise RuntimeError("Sorting algorithm is expected to be of type QuickSort.")
+			raise RuntimeError("Expected sorting algorithm to be of type QuickSort.")
 
 	@thread_id.setter
 	def thread_id(self, thread_id):
 		if type(thread_id) is int and thread_id >= 0:
 			self._thread_id = thread_id
 		else:
-			raise RuntimeError("Thread id must be a non negative integer.")
+			raise RuntimeError("Expected thread_id must be a non negative integer.")
 
 	# override methods
 

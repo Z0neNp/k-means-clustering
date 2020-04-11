@@ -6,13 +6,9 @@ class Point:
 	def __init__(self, x, y):
 		try:
 			self.x = x
-		except Exception as err:
-			err_msg = f"Failed to initialize the Point object with the x value. The reason:\n\t{str(err)}"
-			raise RuntimeError(err_msg)
-		try:
 			self.y = y
 		except Exception as err:
-			err_msg = f"Failed to initialize the Point object with the y value. The reason:\n\t{str(err)}"
+			err_msg = f"Failed to initialize the Point object. The reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
 
 	@property
