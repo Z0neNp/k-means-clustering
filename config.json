@@ -1,7 +1,7 @@
 {
-  "clusters": 10,
+  "clusters": 5,
   "file_with_points": "points",
   "min_precision": 5.0,
-  "processes": 8,
-  "threads": 4
+  "processes": 4,
+  "threads": 2
 }

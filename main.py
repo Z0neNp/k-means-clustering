@@ -62,3 +62,27 @@ if __name__ == '__main__':
 
 	print("\n\n==========Ended the K Means Parallel Clustering==========")
 	print("=========================================================")
+
+
+	print('#########################_DON_MARCHELLO_##################################')
+
+	import os
+	import pandas as pd
+	import matplotlib.pyplot as plt
+
+	li = []
+	with os.scandir('C:/Users/marat/k-means-clustering/assets/') as files:
+		for file in files:
+			print(str(file))
+			if str(file) != "<DirEntry 'points.txt'>":
+				df = pd.read_csv(file, delim_whitespace=True, header=None, names=['N of processes', 'N of threads', 'Time in seconds'])
+				li.append(df)
+
+	frame = pd.concat(li, axis=0, ignore_index=True)
+
+	print(frame)
+	ax = frame.plot(kind='bar', grid=True, title='Processes, threads, time - graph')
+	ax.set_xlabel("N of try")
+	ax.set_ylabel("")
+	plt.show()
+
