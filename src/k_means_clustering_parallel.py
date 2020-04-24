@@ -69,10 +69,9 @@ class KmeansClusteringSlave(multiprocessing.Process):
 
 
 class KmeansClusteringMaster:
-	def __init__(self, clusters_count, min_precision, points, threads_count, processes_count):
+	def __init__(self, clusters_count, points, threads_count, processes_count):
 		try:
 			self.clusters_count = clusters_count
-			self.min_precision = min_precision
 			self.points = points
 			self.threads_count = threads_count
 			self.processes_count = processes_count
@@ -88,10 +87,6 @@ class KmeansClusteringMaster:
 	@property
 	def clusters_count(self):
 		return self._clusters_count
-
-	@property
-	def min_precision(self):
-		return self._min_precision
 
 	@property
 	def points(self):
@@ -111,13 +106,6 @@ class KmeansClusteringMaster:
 			self._clusters_count = clusters_count
 		else:
 			raise RuntimeError("Expected clusters_count to be a positive integer.")
-
-	@min_precision.setter
-	def min_precision(self, min_precision):
-		if type(min_precision) is float and min_precision > 0:
-			self._min_precision = min_precision
-		else:
-			raise RuntimeError("Expected min_precision to be a positive decimal number.")
 
 	@points.setter
 	def points(self, points):
@@ -143,25 +131,25 @@ class KmeansClusteringMaster:
 	def run(self):
 		try:
 			self._quick_sort()
-			print("\n===>\tpoints have been sorted\t<===")
+			print("===>\tpoints have been sorted\t<===")
 			print(f"\tsorting method:\tquick_sort paralleled with {self.threads_count} threads")
 			print("\tsorting order:\tascending")
 			print("\tsorted by:\tdistance from the [0, 0] coordinate")
 			self._init_slaves()
-			print("\n===>\tKMeansClusteringSlaves have been initiated\t<===")
+			print("===>\tKMeansClusteringSlaves have been initiated\t<===")
 			print(f"\tamount of slaves:\t{len(self._slaves)}")
 			print(f"\tprocesses per slave:\t1")
 			self._start_slaves()
-			print("\n===>\tKMeansClusteringSlaves have started their execution\t<===")
+			print("===>\tKMeansClusteringSlaves have started their execution\t<===")
 			self._init_tasks()
-			print("\n===>\ttasks have been enqueued for the KMeansClusteringSlaves\t<===")
+			print("===>\ttasks have been enqueued for the KMeansClusteringSlaves\t<===")
 			print(f"\tamount of tasks:\t{self._tasks.qsize()}")
 			self._kill_slaves()
-			print("\n===>\tpoison pills have been enqueued for the KMeansClusteringSlaves\t<===")
+			print("===>\tpoison pills have been enqueued for the KMeansClusteringSlaves\t<===")
 			self._tasks.join()
 			self._tasks.close()
 			self._stop_slaves()
-			print("\n===>\tKMeansClusteringSlaves have stopped their execution\t<===")
+			print("===>\tKMeansClusteringSlaves have stopped their execution\t<===")
 			self._update_centers_and_diameters()
 			self._update_precision()
 			print("\t{0:20}|{1:^20}".format("cluster center", "cluster diameter"))

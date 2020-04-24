@@ -6,7 +6,7 @@ from src.k_means_clustering_parallel import KmeansClusteringMaster
 
 if __name__ == '__main__':
 	multiprocessing.freeze_support()
-	print("\n\n===========================================================")
+	print("===========================================================")
 	print(f"==========Started the K Means Parallel Clustering==========")
 	try:
 		with open("config.json", "r") as f:
@@ -14,10 +14,9 @@ if __name__ == '__main__':
 	except RuntimeError as err:
 		print(f"Failed to read the configuration file. Reason:\n\t{str(err)}")
 		exit(1)
-	print("\n===>\tThe configurations have been successfully loaded\t<===")
+	print("===>\tThe configurations have been successfully loaded\t<===")
 	print(f"\tfile with the points:\t./assets/{config['file_with_points']}")
 	print(f"\t# of clusters:\t{config['clusters']}")
-	print(f"\tminimal precision per cluster:\t{config['min_precision']}")
 	print(f"\t# of processes:\t{config['processes']}")
 	print(f"\t# of threads per process:\t{config['threads']}")
 
@@ -33,13 +32,12 @@ if __name__ == '__main__':
 	except RuntimeError as err:
 		print(f"Failed to load the points. Reason:\n\t{str(err)}")
 		exit(1)
-	print("\n==>\tXY points have been successfully loaded\t<===")
+	print("==>\tXY points have been successfully loaded\t<===")
 	print(f"\tamount of points:\t{len(points)}")
 
 	start = timer()
 	kmc = KmeansClusteringMaster(
 		config["clusters"],
-		config["min_precision"],
 		points,
 		config["threads"],
 		config["processes"]
@@ -53,36 +51,14 @@ if __name__ == '__main__':
 	data = f"%d %d %.2f" % (config['processes'], config['threads'], end - start)
 	output.write(data)
 	output.close()
-	print("\n===>\tstatistical data has been stored\t<===")
+	print("===>\tstatistical data has been stored\t<===")
 	print(f"\tlocation:\t{filename}")
 	msg = f"\t{config['processes']} processes"
 	msg += f" - {config['threads']} threads per process"
 	msg += " - %.2f execution time in seconds" % (end-start)
 	print(msg)
 
-	print("\n\n==========Ended the K Means Parallel Clustering==========")
+	print("==========Ended the K Means Parallel Clustering==========")
 	print("=========================================================")
 
-
-	print('#########################_DON_MARCHELLO_##################################')
-
-	import os
-	import pandas as pd
-	import matplotlib.pyplot as plt
-
-	li = []
-	with os.scandir('C:/Users/marat/k-means-clustering/assets/') as files:
-		for file in files:
-			print(str(file))
-			if str(file) != "<DirEntry 'points.txt'>":
-				df = pd.read_csv(file, delim_whitespace=True, header=None, names=['N of processes', 'N of threads', 'Time in seconds'])
-				li.append(df)
-
-	frame = pd.concat(li, axis=0, ignore_index=True)
-
-	print(frame)
-	ax = frame.plot(kind='bar', grid=True, title='Processes, threads, time - graph')
-	ax.set_xlabel("N of try")
-	ax.set_ylabel("")
-	plt.show()
 
