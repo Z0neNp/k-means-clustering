@@ -9,8 +9,6 @@ class TestQuickSortParallel(unittest.TestCase):
 			QuickSortParallel(23, 1)
 		with self.assertRaises(RuntimeError):
 			QuickSortParallel([], 0)
-		with self.assertRaises(RuntimeError):
-			QuickSortParallel([], 1)
 		QuickSortParallel([], 2)
 
 	def test_empty_elements_sort(self):

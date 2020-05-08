@@ -97,11 +97,14 @@ class QuickSortParallel:
 
 	@threads_count.setter
 	def threads_count(self, threads_count):
-		if type(threads_count) is int and threads_count % 2 == 0:
-			if threads_count > len(self.elements) > 0:
-				threads_count = len(self.elements)
-				if threads_count % 2 != 0:
-					threads_count += 1
+		if type(threads_count) is int:
+			if threads_count % 2 != 0 and threads_count > 2:
+				threads_count -= 1
+			if threads_count % 2 == 0:
+				if threads_count > len(self.elements) > 0:
+					threads_count = len(self.elements)
+					if threads_count % 2 != 0:
+						threads_count += 1
 			self._threads_count = threads_count
 		else:
 			raise RuntimeError("Expected the threads_count to be an even integer.")
@@ -118,6 +121,11 @@ class QuickSortParallel:
 				worker.start()
 			for worker in self.workers:
 				worker.join()
+			for worker in self.workers:
+				if worker.error:
+					err_msg = f"QuickSortParallelWorker {worker.thread_id} has failed."
+					err_msg += f" The Reason:\n\t{worker.error}"
+					raise RuntimeError(err_msg)
 		except Exception as err:
 			err_msg = f"QuickSortParallel has failed to sort the elements. The reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
