@@ -1,4 +1,8 @@
 class QuickSort:
+	###
+	# An object of the QuickSort type allows to perform a linear quick sort
+	# on the objects that can be compared against each other according to the
+	# greater than, less then, equals notions.
 	def __init__(self, elements):
 		try:
 			self.elements = elements

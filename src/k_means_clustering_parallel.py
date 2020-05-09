@@ -6,7 +6,11 @@ from src.quicksort_parallel import QuickSortParallel
 from src.quicksort import QuickSort
 
 
-def find_local_center_with_greatest_radius(cluster_center, radius, potential_centers,points):
+def find_local_center_with_greatest_radius(cluster_center, radius, potential_centers, points):
+	###
+	# The method receives points and finds a center among them.
+	# The center point has the largest possible radius among all the points.
+	###
 	for point in potential_centers:
 		potential_center = point
 		potential_radius = None
@@ -29,6 +33,14 @@ def find_local_center_with_greatest_radius(cluster_center, radius, potential_cen
 
 
 class KmeansClusteringSlaveWorker(threading.Thread):
+	###
+	# This is a thread object that receives a collection of points
+	# and possible centers for a cluster that will include all of the points.
+	#
+	# The run method will calculate the largest radius from the possible centers
+	# and store it, along with the center for the KmeansClusteringSlave to retrieve
+	# the values.
+	###
 	def __init__(self, thread_id, potential_centers, points):
 		threading.Thread.__init__(self)
 		try:
@@ -36,7 +48,8 @@ class KmeansClusteringSlaveWorker(threading.Thread):
 			self._potential_centers = potential_centers
 			self._points = points
 		except RuntimeError as err:
-			err_msg = f"Failed to initialize KmeansClusteringSlaveWorker object. Reason:\n\t{str(err)}"
+			err_msg = f"Failed to initialize KmeansClusteringSlaveWorker object."
+			err_msg += " The Reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
 		self._center = None
 		self._error = None
@@ -107,6 +120,23 @@ class KmeansClusteringSlaveWorker(threading.Thread):
 
 
 class KmeansClusteringSlave(multiprocessing.Process):
+	###
+	# This is a process object that receives amount of the threads it is allowed to use,
+	# a two queues shared among the process.
+	# The first queue will hold the result of the processes' calculations,
+	# the second queue holds the tasks for the processes' to calculate.
+	#
+	# The run method will pull the tasks from the tasks queue until there are none.
+	# Each task contains a collection of points that represent a cluster.
+	# One of the points should be chosen as a center that covers all the points.
+	#
+	# The task will divided among the KmeansClusteringSlaveWorker objects.
+	# The amount of objects is limited by the amount of threads available.
+	# Each object receives a part of the points to iterate that part and find
+	# a potential center.
+	# Once all the objects conclude their execution, KmeansClusteringSlave chooses
+	# the optimal center and radius among all the potential data.
+	###
 	def __init__(self, tasks_queue, results_queue, threads_count):
 		multiprocessing.Process.__init__(self)
 		try:
@@ -116,7 +146,8 @@ class KmeansClusteringSlave(multiprocessing.Process):
 			self._workers = []
 			self.used_threads = False
 		except Exception as err:
-			err_msg = f"Failed to initialize the KmeansClusteringSlave object. Reason:\n\t{str(err)}"
+			err_msg = f"Failed to initialize the KmeansClusteringSlave object."
+			err_msg += " The Reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
 
 	@property
@@ -140,15 +171,16 @@ class KmeansClusteringSlave(multiprocessing.Process):
 		if type(results_queue) is multiprocessing.queues.Queue:
 			self._results_queue = results_queue
 		else:
-			raise RuntimeError("results_queue expected to be of type multiprocessing.queues.Queue")
+			err_msg = "results_queue expected to be of type multiprocessing.queues.Queue"
+			raise RuntimeError(err_msg)
 
 	@tasks_queue.setter
 	def tasks_queue(self, tasks_queue):
 		if type(tasks_queue) is multiprocessing.queues.JoinableQueue:
 			self._tasks_queue = tasks_queue
 		else:
-			print(f"Actual type is {type(tasks_queue)}")
-			raise RuntimeError("tasks_queue expected to be of type multiprocessing.queues.JoinableQueue")
+			err_msg = "tasks_queue expected to be of type multiprocessing.queues.JoinableQueue"
+			raise RuntimeError(err_msg)
 
 	@threads_count.setter
 	def threads_count(self, threads_count):
@@ -226,7 +258,8 @@ class KmeansClusteringSlave(multiprocessing.Process):
 					cluster_center = worker.center
 					radius = worker.radius
 				elif cluster_center is None or radius is None:
-					err_msg = f"KmeansClusteringSlave has failed because the KmeansClusteringSlaveWorker"
+					err_msg = "KmeansClusteringSlave has failed"
+					err_msg += " because the KmeansClusteringSlaveWorker"
 					err_msg += f" {worker.thread_id} has reported corrupted data."
 					self.results_queue.put(RuntimeError(err_msg))
 					return None, None
@@ -237,6 +270,16 @@ class KmeansClusteringSlave(multiprocessing.Process):
 
 
 class KmeansClusteringMaster:
+	###
+	# The object receives the points for which clusters are to be found.
+	# It assumes that the points are ordered in the ascending order.
+	#
+	# The order assumption is used during the dividing of the points into smaller
+	# tasks that are executed by the KmeansClusteringSlave objects.
+	#
+	# During the run method KmeansClusteringSlave objects are initiated according to the
+	# processes_count value. It passes the tasks into the queue shared among the slaves
+	# and retrieves their results from another shared queue.
 	def __init__(self, clusters_count, points, threads_count, processes_count):
 		try:
 			self.clusters_count = clusters_count
@@ -253,12 +296,24 @@ class KmeansClusteringMaster:
 			raise RuntimeError(err_msg)
 
 	@property
+	def centers(self):
+		return self._centers
+
+	@property
 	def clusters_count(self):
 		return self._clusters_count
 
 	@property
+	def diameters(self):
+		return self._diameters
+
+	@property
 	def points(self):
 		return self._points
+
+	@property
+	def precision(self):
+		return self._precision
 
 	@property
 	def processes_count(self):
@@ -306,7 +361,7 @@ class KmeansClusteringMaster:
 			self._init_slaves()
 			print("===>\tKMeansClusteringSlaves have been initiated\t<===")
 			print(f"\tamount of slaves:\t{len(self._slaves)}")
-			print(f"\tprocesses per slave:\t1")
+			print(f"\tprocesses per slave:\t{self.threads_count}")
 			self._start_slaves()
 			print("===>\tKMeansClusteringSlaves have started their execution\t<===")
 			self._init_tasks()
@@ -320,12 +375,8 @@ class KmeansClusteringMaster:
 			print("===>\tKMeansClusteringSlaves have stopped their execution\t<===")
 			self._update_centers_and_diameters()
 			self._update_precision()
-			print("\t{0:20}|{1:^20}".format("cluster center", "cluster diameter"))
-			for i in range(0, len(self._centers)):
-				print("\t{0:20}|{1:^20.2f}".format(str(self._centers[i]), self._diameters[i]))
-			print("\tprecision is {0:.2f}".format(self._precision))
 		except RuntimeError as err:
-			print(f"KmeansClusteringMaster failed to run. Reason:\n\t{str(err)}")
+			raise RuntimeError(f"KmeansClusteringMaster failed to run. The Reason:\n\t{str(err)}")
 
 	# private
 

@@ -6,48 +6,7 @@ The project has been implemented on the Windows platform with the PyCharm Commun
 2. Python module Pandas version:      1.0.3
 3. Python module Matplotlib version: 3.2.1
 
-## XY points management
-There is an existing file with the 10 000 XY points in the  `"./assets/points.txt"`.
-The following command allows to create new random XY points:
-
-> get_random_points.py NUMBER_OF_POINTS FILENAME_FOR_POINTS
-
-Execution example:
-
-> get_random_points.py 100000 points
-
-## Configuration for the K means clustering
-There is a JSON file that stores the configurations for the next k means clustering execution: `./config.json`
-The description of each option:
-
-> "clusters" is the amount of clusters to create
->
-> "file_with_points" is the filename (without the .txt)
->
-> "processes" is the amount of processes  
->
-> "threads" is the amount of threads per process
-
-Configuration example:
-
-> {
-  "clusters": 5,
-  "file_with_points": "points",
-  "processes": 4,
-  "threads": 2
-}
-
-## Executing K means clustering
-The python script`./exec_k_means.py` will execute the k means clustering according to the configurations mentioned in the `./config.json`.
-The result will be stored in one of the files in the `./assets` directory.
-
-Execution example
-
-> exec_k_means.py
-
 ## Graphical comparison of the K means clustering executions
-The python script `./exec_graph_statistics.py` will draw the comparison between different K means clustering.
-
-Execution example
-
->  exec_graph_statistics.py
+The python script `./main.py` will create random points,
+calculate the clusters for different configurations (amount of processes & threads)
+and draw a graphical comparison.

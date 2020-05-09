@@ -3,6 +3,8 @@ from math import fabs, pow, sqrt
 
 # noinspection PyMethodMayBeStatic
 class Point:
+	###
+	# The class represents the XY points.
 	def __init__(self, x, y):
 		try:
 			self.x = x

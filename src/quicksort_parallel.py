@@ -4,6 +4,9 @@ from src.quicksort import QuickSort
 
 # noinspection PyMethodMayBeStatic
 class QuickSortParallelWorker(threading.Thread):
+	###
+	# An object of the QuickSortParallelWorker is a thread object that knows to execute
+	# the QuickSort object.
 	def __init__(self, thread_id, elements):
 		threading.Thread.__init__(self)
 		try:
@@ -57,6 +60,9 @@ class QuickSortParallelWorker(threading.Thread):
 
 
 class QuickSortParallel:
+	###
+	# The object performs a parallel sorting of the other objects by breaking the sorting
+	# tasks into smaller tasks, executed by the QuickSortParallelWorker objects
 	def __init__(self, elements, threads_count):
 		try:
 			self.elements = elements
@@ -127,7 +133,8 @@ class QuickSortParallel:
 					err_msg += f" The Reason:\n\t{worker.error}"
 					raise RuntimeError(err_msg)
 		except Exception as err:
-			err_msg = f"QuickSortParallel has failed to sort the elements. The reason:\n\t{str(err)}"
+			err_msg = "QuickSortParallel has failed to sort the elements."
+			err_msg = f" The reason:\n\t{str(err)}"
 			raise RuntimeError(err_msg)
 		result = []
 		for worker in self.workers:
@@ -177,7 +184,8 @@ class QuickSortParallel:
 					self._sort_helper(partition_index + 1, high)
 				except Exception as err:
 					err_msg = "Failed at the recursive sort_helper with"
-					err_msg += f"\n\tfollowing the partition index:\t#{partition_index + 1}\n\thigh:\t{high}"
+					err_msg += f"\n\tfollowing the partition index:\t#{partition_index + 1}\n\t"
+					err_msg += "high:\t{high}"
 					err_msg += f"The reason:\n\t{str(err)}"
 					raise RuntimeError(err_msg)
 			else:
